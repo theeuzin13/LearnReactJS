@@ -1,5 +1,5 @@
 //useState e o hook que permite criar estados
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./style.css";
 import { Card } from "../../components/Card";
@@ -12,6 +12,9 @@ export function Home() {
 
   //esse estado e para armazenar os estudantes da lista de presenca
   const [students, setStudents] = useState([]);
+
+  //esse estado ta pegando os objetos nome e avatar da api do github
+  const [user, setUser] = useState({ name: "", avatar: "" });
 
   //funcao para adicionar estudante
   function handleAddStudent() {
@@ -33,9 +36,50 @@ export function Home() {
     setStudents((prevState) => [...prevState, newStudent]);
   }
 
+  useEffect(() => {
+    // corpo do useEffect, tudo que estiver aqui serao as acoes ou aquilo que eu quero que execute
+    // o useEffect e executado assim que a interface e renderizada
+    // o vetor e utilizado para saber quais sao os estados que o useEffect depende, quando ele estiver vazio ele vai ser executado uma unica vez
+
+    //consumingo a api do github
+    //fetch e usado para fazer requisicao http
+    fetch("https://api.github.com/users/theeuzin13")
+      //utilizando o then porque e uma promise
+      //a response esta sendo convertida para json
+      .then((response) => response.json())
+      //aqui esta recuperando os dados da api
+      .then((data) => {
+        //atribuindo para meu setUser o nome e o avatar da api
+        setUser({
+          name: data.name,
+          avatar: data.avatar_url,
+        });
+      });
+  }, []);
+
+  //usando o async no useEffect
+
+  // useEffect(() => {
+  //   async function fetchData(){
+  //     const response = await fetch("https://api.github.com/users/theeuzin13")
+  //     const data = await response.json();
+  //     setUser({
+  //       name: data.name,
+  //       avatar: data.avatar_url,
+  //     });
+  //   }
+  //   fetchData();
+  // }, []);
+
   return (
     <div className="container">
-      <h1>Lista de Presença</h1>
+      <header>
+        <h1>Lista de Presença</h1>
+        <div>
+          <strong>{user.name}</strong>
+          <img src={user.avatar} alt="foto de perfil" />
+        </div>
+      </header>
       <input
         type="text"
         placeholder="Digite o nome..."
